@@ -35,7 +35,7 @@ app.post('/sendMessage', async (req, res) => {
         console.log(info)
         res.send('ok')
     } catch (error) {
-        console.warn(error)
+        res.send('Failure to send. error: ' + error)
     }
 })
 
