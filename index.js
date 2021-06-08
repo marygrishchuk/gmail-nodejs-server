@@ -33,13 +33,18 @@ app.post('/sendMessage', async (req, res) => {
             from: `"no-reply" <mary.grishchuk1@gmail.com>`, // sender address
             to: `${email}`, // list of receivers
             subject: "Thank you for your message to Mary Grishchuk", // Subject line
-            html: `<h2>Dear ${name},</h2>
+            html: `<p>Dear ${name},</p>
                    <p><span>Thank you for your message to Mary Grishchuk. </span>
                    She will get in touch with you as soon as she reads it.</p>
                    <p>Have a great day!</p>
-                   <br>
                    <p><span>** Please kindly note: Do not reply to this email. </span>
                    This email is sent from an unattended mailbox. Replies will not be read.</p>`, // html body
+            dsn: {
+                id: 'message_id',
+                return: 'headers',
+                notify: ['failure', 'delay'],
+                recipient: 'mary.grishchuk1@gmail.com'
+            }
         })
         //sending form data to myself including information about notifying the sender:
         let mailSentToMeInfo = await transporter.sendMail({
@@ -49,7 +54,13 @@ app.post('/sendMessage', async (req, res) => {
             html: `<div><b>Name:</b> ${name}</div>
                    <div><b>Email:</b> ${email}</div>
                    <div><b>Message:</b> ${messageText}</div>
-                   <div><b>Information about notifying the sender:</b> ${senderNotifiedInfo}</div>`, // html body
+                   <div><b>Information about notifying the sender:</b> ${senderNotifiedInfo.envelope}</div>`,//html body
+            dsn: {
+                id: 'message_id',
+                return: 'headers',
+                notify: ['failure', 'delay'],
+                recipient: 'mary.grishchuk1@gmail.com'
+            }
         })
         console.log(mailSentToMeInfo)
         res.send('ok')
