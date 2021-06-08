@@ -21,18 +21,37 @@ let transporter = nodemailer.createTransport({
     },
 })
 
+app.get('/', (req, res) => {
+    res.send("Hello! I'm an email sending server :)")
+})
+
 app.post('/sendMessage', async (req, res) => {
     let {name, email, messageText} = req.body
     try {
-        let info = await transporter.sendMail({
+        //notifying sender that the message is received:
+        let senderNotifiedInfo = await transporter.sendMail({
+            from: `"no-reply" <mary.grishchuk1@gmail.com>`, // sender address
+            to: `${email}`, // list of receivers
+            subject: "Thank you for your message to Mary Grishchuk", // Subject line
+            html: `<h2>Dear ${name},</h2>
+                   <p><span>Thank you for your message to Mary Grishchuk. </span>
+                   She will get in touch with you as soon as she reads it.</p>
+                   <p>Have a great day!</p>
+                   <br>
+                   <p><span>** Please kindly note: Do not reply to this email. </span>
+                   This email is sent from an unattended mailbox. Replies will not be read.</p>`, // html body
+        })
+        //sending form data to myself including information about notifying the sender:
+        let mailSentToMeInfo = await transporter.sendMail({
             from: `"${name}" <${email}>`, // sender address
             to: "mary.grishchuk1@gmail.com", // list of receivers
             subject: "New message from portfolio 'Contact me' form", // Subject line
             html: `<div><b>Name:</b> ${name}</div>
                    <div><b>Email:</b> ${email}</div>
-                   <div><b>Message:</b> ${messageText}</div>`, // html body
+                   <div><b>Message:</b> ${messageText}</div>
+                   <div><b>Information about notifying the sender:</b> ${senderNotifiedInfo}</div>`, // html body
         })
-        console.log(info)
+        console.log(mailSentToMeInfo)
         res.send('ok')
     } catch (error) {
         res.send('Failure to send. error: ' + error)
